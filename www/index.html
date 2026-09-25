@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>YATHAN, le Memory qui fait apprendre</title>
+<meta name="theme-color" content="#140F38">
+<style>
+@font-face{font-family:"Baloo 2";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/baloo-2-latin-600-normal.woff2") format("woff2");}
+@font-face{font-family:"Baloo 2";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/baloo-2-latin-700-normal.woff2") format("woff2");}
+@font-face{font-family:"Baloo 2";font-style:normal;font-weight:800;font-display:swap;src:url("fonts/baloo-2-latin-800-normal.woff2") format("woff2");}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/nunito-latin-400-normal.woff2") format("woff2");}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/nunito-latin-600-normal.woff2") format("woff2");}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/nunito-latin-700-normal.woff2") format("woff2");}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:800;font-display:swap;src:url("fonts/nunito-latin-800-normal.woff2") format("woff2");}
+:root{
+  --bg:#F1ECFF; --surface:#FFFFFF; --surface-2:#E7DFFF; --ink:#1A1446; --muted:#5B5486; --line:#D6CCF7;
+  --back:#2B2170; --paper:#FFFDF7; --paper-ink:#1A1446; --paper-muted:#6B6494;
+  --saffron:#FFB627; --saffron-deep:#C98A00; --jade:#12A07A; --rose:#F2477E; --sky:#2F9BE8;
+  --font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#140F38; --surface:#211A58; --surface-2:#2D2574; --ink:#F4F1FF; --muted:#B3AADB; --line:#3A3180; --back:#3B2FA0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#140F38; --surface:#211A58; --surface-2:#2D2574; --ink:#F4F1FF; --muted:#B3AADB; --line:#3A3180; --back:#3B2FA0;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;}
+button,input,select{font:inherit;color:inherit;}
+button{cursor:pointer;}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--saffron);outline-offset:2px;}
+h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px;}
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* Buttons */
+.btn{border:0;border-radius:999px;padding:12px 24px;font-family:var(--font-display);font-weight:700;font-size:1.1rem;background:var(--saffron);color:#1A1446;box-shadow:0 4px 0 var(--saffron-deep);transition:transform .08s,box-shadow .08s;}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--saffron-deep);}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:0 3px 0 var(--line);border:2px solid var(--line);}
+.btn.big{font-size:1.4rem;padding:14px 36px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.icon-btn{border:2px solid var(--line);background:var(--surface);border-radius:12px;min-width:40px;height:40px;padding:0 10px;font-weight:700;}
+.icon-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* Header / logo */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.tools{display:flex;gap:8px;}
+.logo{display:flex;gap:clamp(4px,1vw,10px);perspective:800px;margin:8px 0 6px;}
+.lt{width:clamp(42px,9vw,78px);aspect-ratio:.78;position:relative;transform-style:preserve-3d;animation:deal .7s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i)*90ms + 150ms);border:0;padding:0;background:none;}
+.lt span{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;}
+.lt .lf{background:var(--paper);color:var(--c);font-family:var(--font-display);font-weight:800;font-size:clamp(28px,6vw,54px);box-shadow:0 4px 0 rgba(26,20,70,.25);}
+.lt .lb{transform:rotateY(180deg);}
+.lt.flip{animation:peekLetter .8s ease both;}
+@keyframes deal{from{transform:rotateY(180deg) translateY(-18px);}to{transform:rotateY(0) translateY(0);}}
+@keyframes peekLetter{0%{transform:rotateY(0);}40%,60%{transform:rotateY(180deg);}100%{transform:rotateY(360deg);}}
+.tagline{font-family:var(--font-display);font-size:1.25rem;color:var(--muted);margin:0 0 20px;}
+
+/* Setup layout */
+.setup-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px;}
+.panel h2{font-size:1.45rem;margin-bottom:12px;}
+.panel + .panel{margin-top:20px;}
+.prow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;margin-bottom:10px;}
+.prow .av{width:46px;height:46px;border-radius:50%;border:0;background:var(--pc);font-size:24px;display:grid;place-items:center;box-shadow:0 3px 0 rgba(0,0,0,.2);}
+.prow input,.prow select{height:44px;border-radius:12px;border:2px solid var(--line);background:var(--bg);padding:0 10px;min-width:0;}
+.prow select{max-width:150px;}
+.note{color:var(--muted);font-size:.95rem;margin:6px 0 0;}
+.opt{display:flex;align-items:center;gap:10px;margin:8px 0;font-weight:600;}
+.opt input{width:22px;height:22px;accent-color:var(--jade);}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.chip{border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.chip .ic{font-size:1.8rem;line-height:1.1;}
+.chip b{font-family:var(--font-display);font-size:1.1rem;}
+.chip small{color:var(--muted);}
+.chip[aria-pressed="true"],.lvl[aria-pressed="true"]{border-color:var(--saffron);background:var(--surface-2);box-shadow:0 0 0 3px var(--saffron) inset;}
+.levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+.lvl{border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:4px;}
+.pips{display:flex;gap:3px;}
+.pips i{width:10px;height:10px;border-radius:50%;background:var(--line);}
+.pips i.on{background:var(--rose);}
+.lvl b{font-family:var(--font-display);font-size:1.15rem;}
+.lvl small{color:var(--muted);font-size:.85rem;line-height:1.3;}
+.lvl .best{font-size:.85rem;font-weight:700;color:var(--jade);min-height:1.2em;}
+.start-row{display:flex;justify-content:center;margin-top:24px;}
+details.rules{margin-top:20px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:14px 18px;}
+details.rules summary{font-family:var(--font-display);font-weight:700;font-size:1.2rem;cursor:pointer;}
+details.rules ul{padding-left:20px;margin:10px 0 0;}
+details.rules li{margin:4px 0;max-width:72ch;}
+
+/* Game */
+.gbar{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}
+.gtitle{font-family:var(--font-display);font-weight:700;font-size:1.2rem;display:flex;gap:10px;align-items:center;}
+.clock{font-family:var(--font-display);font-weight:700;font-size:1.2rem;font-variant-numeric:tabular-nums;}
+.scoreboard{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.pl{display:flex;align-items:center;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:5px 12px 5px 5px;transition:transform .2s,border-color .2s;}
+.pl.active{border-color:var(--pc);box-shadow:0 0 0 3px var(--pc);transform:translateY(-2px);}
+.pl .av{width:38px;height:38px;border-radius:50%;background:var(--pc);display:grid;place-items:center;font-size:21px;}
+.pl .pn{font-weight:800;display:block;line-height:1.1;}
+.pl .ps{font-size:.85rem;color:var(--muted);display:block;}
+.pl .ps b{font-family:var(--font-display);font-size:1.15rem;color:var(--ink);}
+.pl .combo{background:var(--rose);color:#fff;font-family:var(--font-display);font-weight:800;border-radius:999px;padding:0 9px;animation:pop .35s;}
+.pl .pw{font-size:.8rem;color:var(--muted);white-space:nowrap;}
+.turn{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.turn-label{font-family:var(--font-display);font-size:1.3rem;}
+.left{color:var(--muted);font-weight:600;}
+.timer{flex:1 1 160px;height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden;min-width:120px;}
+.timer i{display:block;height:100%;width:100%;background:var(--jade);border-radius:inherit;transition:width .1s linear,background .3s;}
+.timer.low i{background:var(--rose);}
+.timer[hidden]{display:none;}
+
+.grid{display:grid;grid-template-columns:repeat(var(--cols),var(--cw));gap:var(--gap);justify-content:center;margin:0 auto;perspective:1100px;}
+.grid.quake{animation:quake .6s;}
+.card{width:var(--cw);aspect-ratio:.78;padding:0;border:0;background:none;border-radius:14px;position:relative;}
+.card:disabled{cursor:default;}
+.card .inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.35,.5,1);border-radius:inherit;}
+.card.is-up .inner{transform:rotateY(180deg);}
+.grid.can-play .card:not(.is-up):hover .inner{transform:translateY(-4px) rotate(-1.5deg);}
+.face{position:absolute;inset:0;border-radius:inherit;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.back{
+  background:
+    radial-gradient(circle at 50% 50%, var(--saffron) 0 21%, transparent 22%),
+    radial-gradient(circle at 50% 50%, transparent 0 27%, var(--rose) 28% 32%, transparent 33%),
+    radial-gradient(circle at 0 0, var(--jade) 0 16%, transparent 17%),
+    radial-gradient(circle at 100% 100%, var(--sky) 0 16%, transparent 17%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,.09) 0 6px, transparent 6px 12px),
+    var(--back);
+  box-shadow:0 4px 0 rgba(10,6,40,.35);
+}
+.back::after{content:"Y";font-family:var(--font-display);font-weight:800;color:var(--back);font-size:calc(var(--cw)*.24);line-height:1;}
+.front{transform:rotateY(180deg);background:var(--paper);color:var(--paper-ink);box-shadow:0 4px 0 rgba(10,6,40,.25);border:3px solid transparent;padding:10% 6% 6%;gap:4%;}
+.front::before{content:"";position:absolute;left:0;right:0;top:0;height:7%;background:var(--side);}
+.side-a{--side:var(--sky);} .side-b{--side:var(--jade);} .sp-trap{--side:var(--rose);} .sp-star{--side:var(--saffron);}
+.tag{font-size:max(9px,calc(var(--cw)*.1));font-weight:800;color:var(--paper-muted);line-height:1;}
+.main{font-family:var(--font-display);font-weight:700;font-size:max(11px,calc(var(--cw)*.17));line-height:1.05;text-align:center;overflow-wrap:anywhere;hyphens:auto;}
+.main.long{font-size:max(10px,calc(var(--cw)*.14));}
+.main.xlong{font-size:max(9.5px,calc(var(--cw)*.12));}
+.main.big{font-size:calc(var(--cw)*.3);}
+.main.emoji{font-size:calc(var(--cw)*.46);line-height:1;}
+.card.is-matched .front{border-color:var(--owner);}
+.card.is-matched .front::after{content:"✓";position:absolute;right:6%;bottom:4%;width:calc(var(--cw)*.2);height:calc(var(--cw)*.2);border-radius:50%;background:var(--owner);color:#1A1446;font-weight:800;font-size:calc(var(--cw)*.13);display:grid;place-items:center;}
+.card.is-matched{animation:pop .45s;}
+.card.is-wrong{animation:wiggle .45s;}
+.card.is-gone{opacity:.25;}
+.card.is-hint .inner{animation:glow 1.1s ease 2;}
+.card.is-moved{animation:wobble 1.1s;}
+@keyframes pop{0%{transform:scale(1);}40%{transform:scale(1.1);}100%{transform:scale(1);}}
+@keyframes wiggle{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+@keyframes glow{0%,100%{filter:none;}50%{filter:drop-shadow(0 0 10px var(--saffron)) drop-shadow(0 0 4px var(--saffron));}}
+@keyframes wobble{0%,100%{transform:rotate(0);}20%{transform:rotate(-6deg);}40%{transform:rotate(5deg);}60%{transform:rotate(-3deg);}80%{transform:rotate(2deg);}}
+@keyframes quake{0%,100%{transform:translate(0);}20%{transform:translate(-5px,2px);}40%{transform:translate(5px,-2px);}60%{transform:translate(-3px,1px);}80%{transform:translate(3px,-1px);}}
+.powers{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;}
+.powers .btn{font-size:1rem;padding:10px 18px;}
+details.notebook{max-width:720px;margin:18px auto 0;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:10px 16px;}
+details.notebook summary{font-family:var(--font-display);font-weight:700;cursor:pointer;}
+details.notebook ul,.learned{margin:8px 0 0;padding-left:20px;}
+details.notebook li,.learned li{margin:3px 0;}
+.float{position:fixed;z-index:30;pointer-events:none;font-family:var(--font-display);font-weight:800;font-size:1.6rem;color:var(--rose);text-shadow:0 2px 0 #fff;animation:rise .9s ease-out forwards;}
+@keyframes rise{from{transform:translate(-50%,0);opacity:1;}to{transform:translate(-50%,-60px);opacity:0;}}
+
+/* Toast / modal / confetti */
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);max-width:min(560px,calc(100% - 24px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:16px;font-weight:700;z-index:40;transition:transform .3s;box-shadow:0 8px 24px rgba(10,6,40,.3);}
+.toast.show{transform:translate(-50%,0);opacity:1;}
+.toast:not(.show){opacity:0;}
+.toast.lesson{background:var(--jade);color:#fff;}
+.backdrop{position:fixed;inset:0;background:rgba(10,6,40,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
+.backdrop.open{display:flex;}
+.modal{background:var(--surface);color:var(--ink);border-radius:26px;max-width:680px;width:100%;max-height:88vh;overflow:auto;padding:24px;border:2px solid var(--line);}
+.modal h2{font-size:2rem;margin-bottom:6px;}
+.modal .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;}
+.stars{font-size:2.2rem;letter-spacing:4px;color:var(--saffron);}
+.table-wrap{overflow-x:auto;}
+table{border-collapse:collapse;width:100%;margin-top:12px;}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;}
+th{color:var(--muted);font-weight:700;font-size:.9rem;}
+td b{font-family:var(--font-display);font-size:1.15rem;}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px;}
+.badge{border:2px solid var(--line);border-radius:16px;padding:10px;background:var(--bg);}
+.badge .bi{font-size:1.8rem;}
+.badge b{display:block;font-family:var(--font-display);}
+.badge small{color:var(--muted);}
+.badge.locked{opacity:.4;filter:grayscale(1);}
+.badge.fresh{border-color:var(--saffron);box-shadow:0 0 0 3px var(--saffron) inset;}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60;width:100%;height:100%;}
+
+
+/* Écran d'introduction */
+#intro{position:fixed;inset:0;z-index:100;background:#140F38;color:#F4F1FF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);transition:opacity .6s ease,visibility .6s;}
+#intro.hide{opacity:0;visibility:hidden;}
+#intro .intro-card{--back:#3B2FA0;--cw:clamp(120px,32vw,170px);width:var(--cw);aspect-ratio:.78;border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 0 rgba(0,0,0,.35);animation:introCard 1.3s cubic-bezier(.3,1.4,.5,1) both;}
+#intro .intro-word{display:flex;gap:.04em;font-family:var(--font-display);font-weight:800;font-size:clamp(52px,15vw,104px);line-height:1;margin-top:8px;}
+#intro .intro-word span{display:inline-block;animation:introLetter .6s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(900ms + var(--i) * 110ms);}
+#intro .intro-tag{margin:0;font-family:var(--font-display);font-size:clamp(17px,4.5vw,22px);color:#B3AADB;animation:introFade .8s ease 1.8s both;}
+#intro .intro-bar{width:160px;height:6px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden;margin-top:10px;}
+#intro .intro-bar i{display:block;height:100%;width:0;background:#FFB627;border-radius:inherit;animation:introBar 4.6s linear .2s forwards;}
+#intro .intro-sign{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;font-weight:800;letter-spacing:.3em;font-size:15px;color:#B3AADB;animation:introFade .8s ease 2.2s both;}
+@keyframes introCard{0%{transform:perspective(700px) rotateY(180deg) scale(.6);opacity:0;}60%{opacity:1;}100%{transform:perspective(700px) rotateY(0) scale(1);}}
+@keyframes introLetter{from{transform:translateY(40px) rotate(-8deg);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes introFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes introBar{to{width:100%;}}
+@media (max-width:820px){
+  .setup-grid{grid-template-columns:1fr;}
+  .levels{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
+@media (max-width:560px){
+  .wrap{padding:14px 10px 40px;}
+  .prow{grid-template-columns:auto 1fr auto;}
+  .prow select{grid-column:2 / 3;max-width:none;}
+  .prow .prm{grid-row:1;grid-column:3;}
+  .pl{padding-right:8px;}
+  .pl .pw{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+}
+</style>
+</head>
+<body>
+<div id="intro" role="img" aria-label="YATHAN, JS-2026">
+  <div class="intro-card back"></div>
+  <div class="intro-word" aria-hidden="true"><span style="--i:0;color:#FFB627">Y</span><span style="--i:1;color:#F2477E">A</span><span style="--i:2;color:#2F9BE8">T</span><span style="--i:3;color:#12A07A">H</span><span style="--i:4;color:#F2477E">A</span><span style="--i:5;color:#FFB627">N</span></div>
+  <p class="intro-tag">Retourne, retiens, apprends.</p>
+  <div class="intro-bar" aria-hidden="true"><i></i></div>
+  <div class="intro-sign">JS-2026</div>
+</div>
+<div class="wrap">
+
+<!-- ÉCRAN D'ACCUEIL -->
+<section id="screen-setup" class="screen active" aria-label="Préparer la partie">
+  <div class="top">
+    <div>
+      <h1 class="logo" id="logo" aria-label="YATHAN"></h1>
+      <p class="tagline">Retourne, retiens, apprends.</p>
+    </div>
+    <div class="tools">
+      <button class="icon-btn" id="btnSound" type="button" aria-label="Sons"></button>
+      <button class="icon-btn" id="btnTheme" type="button" aria-label="Changer l’apparence"></button>
+      <button class="icon-btn" id="btnRecords" type="button">🏆 Records</button>
+    </div>
+  </div>
+
+  <div class="setup-grid">
+    <div>
+      <div class="panel">
+        <h2>Qui joue ?</h2>
+        <div id="players"></div>
+        <button class="btn ghost" id="addPlayer" type="button">Ajouter un joueur</button>
+        <p class="note" id="playersNote">Jusqu’à 4 joueurs, humains ou robots. Touchez l’avatar pour le changer.</p>
+      </div>
+      <div class="panel">
+        <h2>Options</h2>
+        <label class="opt"><input type="checkbox" id="optLessons"> Afficher une leçon à chaque paire trouvée</label>
+        <label class="opt"><input type="checkbox" id="optSound"> Effets sonores</label>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h2>Que veux-tu apprendre ?</h2>
+        <div class="themes" id="themes"></div>
+      </div>
+      <div class="panel">
+        <h2>Niveau</h2>
+        <div class="levels" id="levels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="start-row"><button class="btn big" id="btnStart" type="button">Lancer la partie</button></div>
+
+  <details class="rules">
+    <summary>Comment jouer</summary>
+    <ul>
+      <li>À ton tour, retourne deux cartes. Si elles vont ensemble (un animal et son nom, un pays et sa capitale, un mot et sa traduction…), tu gagnes des points et tu rejoues.</li>
+      <li>Sinon, elles se retournent et la main passe au joueur suivant.</li>
+      <li>Les paires enchaînées multiplient les points : ×2, ×3… jusqu’à ×5.</li>
+      <li>Aux niveaux chronométrés, les secondes restantes rapportent un bonus.</li>
+      <li>💣 Piège : −15 points et fin du tour. ⭐ Étoile : un pouvoir en plus, sans perdre ton tour.</li>
+      <li>👁 Coup d’œil montre toutes les cartes 1,5 s. 💡 Indice fait briller la partenaire de la carte que tu viens de retourner.</li>
+      <li>Niveau Maître : toutes les 3 erreurs, quatre cartes changent de place.</li>
+      <li>Raccourcis clavier : P ou Échap pour la pause, 1 pour le coup d’œil, 2 pour l’indice.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ÉCRAN DE JEU -->
+<section id="screen-game" class="screen" aria-label="Partie en cours">
+  <div class="gbar">
+    <div class="gtitle" id="gTitle"></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="clock" id="clock" aria-label="Temps de jeu">0:00</span>
+      <button class="btn ghost" id="btnPause" type="button">Pause</button>
+    </div>
+  </div>
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="turn">
+    <span class="turn-label" id="turnLabel" aria-live="polite"></span>
+    <span class="left" id="left"></span>
+    <div class="timer" id="timer" hidden><i id="timerFill"></i></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="powers">
+    <button class="btn ghost" id="pwPeek" type="button"></button>
+    <button class="btn ghost" id="pwHint" type="button"></button>
+  </div>
+  <details class="notebook" id="notebook">
+    <summary id="nbTitle">📘 Carnet</summary>
+    <ul id="nbList"></ul>
+  </details>
+</section>
+</div>
+
+<div class="backdrop" id="backdrop"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ---------- Utilitaires ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sample = (a, n) => shuffle([...a]).slice(0, n);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('yathan:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('yathan:' + k, JSON.stringify(v)); } catch (e) {} }
+};
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Contenus éducatifs ---------- */
+const ANIMALS = [
+  ["🦁","Lion","Son rugissement s’entend jusqu’à 8 km."],
+  ["🐘","Éléphant","C’est le plus grand animal terrestre."],
+  ["🦒","Girafe","Elle a 7 vertèbres dans le cou, comme nous."],
+  ["🦓","Zèbre","Chaque zèbre a des rayures uniques, comme une empreinte."],
+  ["🐊","Crocodile","Ses ancêtres vivaient déjà au temps des dinosaures."],
+  ["🦛","Hippopotame","Il peut rester environ 5 minutes sous l’eau."],
+  ["🦏","Rhinocéros","Sa corne est faite de kératine, comme nos ongles."],
+  ["🐆","Léopard","Il hisse ses proies dans les arbres pour les protéger."],
+  ["🦍","Gorille","C’est le plus grand des primates."],
+  ["🦩","Flamant","Sa couleur rose vient de ce qu’il mange."],
+  ["🐢","Tortue","Certaines tortues vivent plus de 100 ans."],
+  ["🦅","Aigle","Sa vue est bien plus perçante que la nôtre."],
+  ["🐍","Serpent","Il capte les odeurs avec sa langue."],
+  ["🦉","Hibou","Il peut tourner la tête d’environ 270°."],
+  ["🐬","Dauphin","Il dort avec une moitié du cerveau à la fois."],
+  ["🐫","Chameau","Ses bosses stockent de la graisse, pas de l’eau."],
+  ["🐝","Abeille","Elle indique les fleurs aux autres par une danse."],
+  ["🐙","Pieuvre","Elle a trois cœurs et le sang bleu."]
+];
+const CAPITALS = [
+  ["Cameroun","Yaoundé","On la surnomme la « ville aux sept collines »."],
+  ["Sénégal","Dakar","Elle est proche du point le plus à l’ouest de l’Afrique continentale."],
+  ["Nigeria","Abuja","Elle a remplacé Lagos comme capitale en 1991."],
+  ["Kenya","Nairobi","Un parc national s’étend aux portes de la ville."],
+  ["Ghana","Accra","Le Ghana est devenu indépendant en 1957."],
+  ["Égypte","Le Caire","La ville s’étend sur les rives du Nil."],
+  ["Maroc","Rabat","Elle borde l’océan Atlantique."],
+  ["Côte d’Ivoire","Yamoussoukro","Abidjan reste la plus grande ville du pays."],
+  ["Éthiopie","Addis-Abeba","Elle accueille le siège de l’Union africaine."],
+  ["Gabon","Libreville","L’équateur traverse le Gabon."],
+  ["Mali","Bamako","Elle est traversée par le fleuve Niger."],
+  ["Tchad","N’Djamena","Elle se trouve au confluent du Chari et du Logone."],
+  ["Congo","Brazzaville","Kinshasa est juste en face, de l’autre côté du fleuve Congo."],
+  ["RD Congo","Kinshasa","C’est l’une des plus grandes villes francophones du monde."],
+  ["Tanzanie","Dodoma","Dar es Salaam reste la plus grande ville du pays."],
+  ["Afrique du Sud","Pretoria","Le pays a trois capitales : Pretoria, Le Cap et Bloemfontein."],
+  ["Algérie","Alger","On la surnomme « Alger la Blanche »."],
+  ["Rwanda","Kigali","La ville est réputée pour sa propreté."]
+];
+const ELEMENTS = [
+  ["H","Hydrogène","C’est l’élément le plus léger de l’Univers."],
+  ["O","Oxygène","Il forme environ 21 % de l’air."],
+  ["C","Carbone","On le trouve dans tous les êtres vivants."],
+  ["N","Azote","Il forme environ 78 % de l’air."],
+  ["Fe","Fer","Son symbole vient du latin ferrum."],
+  ["Au","Or","Son symbole vient du latin aurum."],
+  ["Ag","Argent","Son symbole vient du latin argentum."],
+  ["Na","Sodium","Du latin natrium ; il est dans le sel de cuisine."],
+  ["K","Potassium","Du latin kalium ; la banane en contient."],
+  ["Ca","Calcium","Il solidifie nos os et nos dents."],
+  ["Cu","Cuivre","Du latin cuprum ; il conduit très bien l’électricité."],
+  ["He","Hélium","Plus léger que l’air, il fait flotter les ballons."],
+  ["Cl","Chlore","Il sert à désinfecter l’eau des piscines."],
+  ["Zn","Zinc","Il protège l’acier de la rouille."],
+  ["Pb","Plomb","Son symbole vient du latin plumbum."],
+  ["S","Soufre","Il est présent dans le gaz à odeur d’œuf pourri."],
+  ["Hg","Mercure","C’est le seul métal liquide à température ambiante."],
+  ["Si","Silicium","Il est au cœur des puces électroniques."]
+];
+const WORDS = [
+  ["la maison","das Haus","house"],["le chien","der Hund","dog"],["le chat","die Katze","cat"],
+  ["le pain","das Brot","bread"],["l’eau","das Wasser","water"],["le soleil","die Sonne","sun"],
+  ["la lune","der Mond","moon"],["le livre","das Buch","book"],["l’école","die Schule","school"],
+  ["l’arbre","der Baum","tree"],["la pomme","der Apfel","apple"],["la voiture","das Auto","car"],
+  ["l’ami","der Freund","friend"],["la main","die Hand","hand"],["la fleur","die Blume","flower"],
+  ["le lait","die Milch","milk"],["la montagne","der Berg","mountain"],["le fromage","der Käse","cheese"]
+];
+const TECH = [
+  ["CPU","Processeur","le « cerveau » de l’ordinateur, il exécute les instructions des programmes."],
+  ["RAM","Mémoire vive","elle garde les données en cours d’utilisation et s’efface à l’extinction."],
+  ["GPU","Carte graphique","elle calcule les images affichées à l’écran."],
+  ["SSD","Disque SSD","il stocke les fichiers sur de la mémoire flash, sans pièce mobile."],
+  ["HDD","Disque dur","il stocke les données sur des plateaux magnétiques qui tournent."],
+  ["PSU","Alimentation","elle convertit le courant de la prise pour alimenter les composants."],
+  ["MB","Carte mère","elle relie tous les composants entre eux."],
+  ["NIC","Carte réseau","elle relie l’ordinateur à un réseau, avec ou sans fil."],
+  ["USB","Port USB","il connecte clés, souris, claviers et bien d’autres appareils."],
+  ["🖱️","Souris","elle déplace le pointeur à l’écran.",1],
+  ["⌨️","Clavier","il sert à saisir du texte et des commandes.",1],
+  ["🖥️","Écran","il affiche les images produites par la carte graphique.",1],
+  ["🖨️","Imprimante","elle reproduit documents et images sur papier.",1],
+  ["🎧","Casque","il transforme le signal audio en son.",1],
+  ["🎤","Micro","il transforme la voix en signal électrique.",1],
+  ["💾","Disquette","l’ancêtre de la clé USB, avec environ 1,44 Mo de stockage.",1],
+  ["🔋","Batterie","elle alimente l’ordinateur portable sans prise.",1],
+  ["💿","Disque optique","il se lit au laser : CD, DVD ou Blu-ray.",1]
+];
+
+function mathPairs(n, lvl) {
+  const out = [], seen = new Set(); let guard = 0;
+  while (out.length < n && guard++ < 3000) {
+    let q, r;
+    if (lvl === 1) { const a = R(1, 9), b = R(1, 9); q = `${a} + ${b}`; r = a + b; }
+    else if (lvl === 2) {
+      if (Math.random() < .5) { const a = R(6, 20), b = R(1, a - 1); q = `${a} − ${b}`; r = a - b; }
+      else { const a = R(3, 15), b = R(3, 15); q = `${a} + ${b}`; r = a + b; }
+    }
+    else if (lvl === 3) { const a = R(2, 9), b = R(2, 9); q = `${a} × ${b}`; r = a * b; }
+    else if (lvl === 4) {
+      if (Math.random() < .5) { const a = R(3, 12), b = R(3, 12); q = `${a} × ${b}`; r = a * b; }
+      else { const b = R(2, 9), r0 = R(2, 12); q = `${b * r0} ÷ ${b}`; r = r0; }
+    }
+    else {
+      const a = R(2, 9), b = R(2, 9), c = R(1, Math.min(20, a * b - 1));
+      if (Math.random() < .5) { q = `${a} × ${b} + ${c}`; r = a * b + c; } else { q = `${a} × ${b} − ${c}`; r = a * b - c; }
+    }
+    if (seen.has(r)) continue;
+    seen.add(r);
+    out.push({ a: { main: q, tag: 'Calcul' }, b: { main: String(r), tag: 'Résultat', big: true }, lesson: `🧮 ${q} = ${r}` });
+  }
+  return out;
+}
+const B = {
+  animaux: n => sample(ANIMALS, n).map(([e, name, f]) => ({ a: { main: e, emoji: true }, b: { main: name, tag: 'Animal' }, lesson: `${e} ${name} : ${f[0].toLowerCase() + f.slice(1)}` })),
+  capitales: n => sample(CAPITALS, n).map(([c, cap, f]) => ({ a: { main: c, tag: 'Pays' }, b: { main: cap, tag: 'Capitale' }, lesson: `🌍 ${c} → ${cap}. ${f}` })),
+  calcul: (n, l) => mathPairs(n, l),
+  informatique: n => sample(TECH, n).map(([c, name, f, emo]) => emo
+    ? { a: { main: c, emoji: true }, b: { main: name, tag: 'Composant' }, lesson: `${c} ${name} : ${f}` }
+    : { a: { main: c, tag: 'Sigle', big: true }, b: { main: name, tag: 'Composant' }, lesson: `💻 ${c} = ${name} : ${f}` }),
+  english: n => sample(WORDS, n).map(([fr, , en]) => ({ a: { main: fr, tag: 'FR' }, b: { main: en, tag: 'EN' }, lesson: `🗣️ « ${fr} » se dit « ${en} » en anglais.` })),
+  chimie: n => sample(ELEMENTS, n).map(([s, name, f]) => ({ a: { main: s, tag: 'Symbole', big: true }, b: { main: name, tag: 'Élément' }, lesson: `⚗️ ${s} = ${name}. ${f}` }))
+};
+const THEMES = [
+  { id: 'animaux', label: 'Animaux', icon: '🦁', hint: 'Emoji et nom', build: B.animaux },
+  { id: 'capitales', label: 'Capitales d’Afrique', icon: '🌍', hint: 'Pays et capitale', build: B.capitales },
+  { id: 'calcul', label: 'Calcul mental', icon: '🧮', hint: 'Opération et résultat', build: B.calcul },
+  { id: 'informatique', label: 'Informatique', icon: '💻', hint: 'Composant et nom', build: B.informatique },
+  { id: 'english', label: 'English', icon: '🇬🇧', hint: 'Français et anglais', build: B.english },
+  { id: 'chimie', label: 'Éléments', icon: '⚗️', hint: 'Symbole et nom', build: B.chimie },
+  { id: 'mixte', label: 'Grand mélange', icon: '🎲', hint: 'Un peu de tout', build: (n, l) => {
+      const srcs = shuffle(['animaux', 'capitales', 'calcul', 'informatique', 'chimie']);
+      const counts = srcs.map((_, i) => Math.floor(n / srcs.length) + (i < n % srcs.length ? 1 : 0));
+      return shuffle(srcs.flatMap((s, i) => counts[i] ? B[s](counts[i], l) : []));
+    } }
+];
+
+const LEVELS = [
+  { id: 1, name: 'Découverte', desc: '6 paires. Toutes les cartes s’affichent 3 s au départ.', pairs: 6, cols: 4, peek: 3000, turn: 0, traps: 0, stars: 0, quake: 0 },
+  { id: 2, name: 'Apprenti', desc: '8 paires. Un aperçu éclair au départ.', pairs: 8, cols: 4, peek: 1200, turn: 0, traps: 0, stars: 0, quake: 0 },
+  { id: 3, name: 'Explorateur', desc: '10 paires. 20 s par tour, bonus de vitesse.', pairs: 10, cols: 5, peek: 0, turn: 20, traps: 0, stars: 0, quake: 0 },
+  { id: 4, name: 'Expert', desc: '11 paires, un piège 💣 et une étoile ⭐. 12 s par tour.', pairs: 11, cols: 6, peek: 0, turn: 12, traps: 1, stars: 1, quake: 0 },
+  { id: 5, name: 'Maître', desc: '13 paires, deux pièges. Les cartes bougent toutes les 3 erreurs.', pairs: 13, cols: 6, peek: 0, turn: 9, traps: 2, stars: 1, quake: 3 }
+];
+const AVATARS = ['🦊','🐼','🦉','🐸','🐯','🐙','🦄','🐧','🦁','🐨','🐢','🦒'];
+const COLORS = ['var(--saffron)', 'var(--jade)', 'var(--rose)', 'var(--sky)'];
+const BOTS = { easy: .35, mid: .7, hard: .95 };
+const BADGES = [
+  { id: 'first', icon: '🎉', name: 'Première partie', desc: 'Terminer une partie.' },
+  { id: 'elephant', icon: '🐘', name: 'Mémoire d’éléphant', desc: 'Finir avec au moins 80 % de précision.' },
+  { id: 'combo4', icon: '🔥', name: 'En feu', desc: 'Enchaîner 4 paires de suite.' },
+  { id: 'survivor', icon: '🛡️', name: 'Démineur', desc: 'Finir un niveau à pièges sans en toucher.' },
+  { id: 'fast', icon: '⚡', name: 'Éclair', desc: 'Finir seul le niveau 3 ou plus en moins de 2 min.' },
+  { id: 'geek', icon: '💻', name: 'Geek', desc: 'Finir une partie sur les composants informatiques.' },
+  { id: 'explorer', icon: '🧭', name: 'Curieux', desc: 'Jouer dans tous les thèmes.' },
+  { id: 'master', icon: '👑', name: 'Maître YATHAN', desc: 'Gagner une partie au niveau 5.' }
+];
+
+/* ---------- Réglages ---------- */
+const defaults = { players: [{ name: 'Joueur 1', avatar: '🦊', type: 'human' }, { name: 'Yathy', avatar: '🐙', type: 'mid' }], theme: 'animaux', level: 1, lessons: true, sound: true, look: 'auto' };
+let setup = Object.assign({}, defaults, store.get('setup', {}));
+if (!Array.isArray(setup.players) || !setup.players.length) setup.players = defaults.players;
+if (!THEMES.some(t => t.id === setup.theme)) setup.theme = 'animaux';
+if (!(setup.level >= 1 && setup.level <= 5)) setup.level = 1;
+const save = () => store.set('setup', setup);
+
+/* ---------- Son ---------- */
+let AC;
+function tone(f, d = .12, type = 'sine', vol = .14, delay = 0) {
+  if (!setup.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + .02);
+  } catch (e) {}
+}
+function sfx(k, n = 1) {
+  if (k === 'flip') tone(540, .06, 'triangle', .08);
+  if (k === 'match') [523, 659, 784].forEach((f, i) => tone(f * (1 + (Math.min(n, 5) - 1) * .12), .16, 'triangle', .14, i * .07));
+  if (k === 'miss') { tone(230, .16, 'sawtooth', .05); tone(180, .2, 'sawtooth', .05, .1); }
+  if (k === 'trap') { tone(110, .35, 'square', .1); tone(70, .45, 'square', .1, .12); }
+  if (k === 'star') [880, 1175, 1568, 2093].forEach((f, i) => tone(f, .12, 'sine', .09, i * .05));
+  if (k === 'win') [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, .22, 'triangle', .13, i * .12));
+  if (k === 'tick') tone(1100, .03, 'square', .03);
+}
+
+/* ---------- Confettis ---------- */
+const cv = $('#confetti'), cx = cv.getContext('2d');
+let parts = [], raf = 0;
+function sizeCanvas() { cv.width = innerWidth; cv.height = innerHeight; }
+sizeCanvas();
+function burst(n = 80, x = innerWidth / 2, y = innerHeight / 3) {
+  if (reduced) return;
+  const cols = ['#FFB627', '#12A07A', '#F2477E', '#2F9BE8', '#FFFDF7'];
+  for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 13, vy: -Math.random() * 12 - 3, s: 5 + Math.random() * 6, c: pick(cols), r: Math.random() * 6, vr: (Math.random() - .5) * .35, life: 140 });
+  if (!raf) raf = requestAnimationFrame(loop);
+}
+function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  parts.forEach(p => { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .66); cx.restore(); });
+  parts = parts.filter(p => p.life > 0 && p.y < cv.height + 20);
+  raf = parts.length ? requestAnimationFrame(loop) : 0;
+  if (!raf) cx.clearRect(0, 0, cv.width, cv.height);
+}
+
+/* ---------- Toast / modale ---------- */
+let toastT;
+function toast(msg, kind = '', ms = 2300) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + kind;
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = 'toast', ms);
+}
+let modalClose = null;
+function openModal(html, onClose) {
+  $('#modal').innerHTML = html; $('#backdrop').classList.add('open'); modalClose = onClose || null;
+  const f = $('#modal').querySelector('button'); if (f) f.focus();
+}
+function closeModal(run = true) {
+  $('#backdrop').classList.remove('open');
+  const fn = modalClose; modalClose = null; if (run && fn) fn();
+}
+$('#backdrop').addEventListener('click', e => { if (e.target.id === 'backdrop') closeModal(); });
+
+/* ---------- Apparence ---------- */
+function applyLook() {
+  const r = document.documentElement;
+  if (setup.look === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', setup.look);
+  $('#btnTheme').textContent = { auto: '🌓', light: '☀️', dark: '🌙' }[setup.look];
+  $('#btnTheme').setAttribute('aria-label', 'Apparence : ' + { auto: 'automatique', light: 'claire', dark: 'sombre' }[setup.look]);
+  $('#btnSound').textContent = setup.sound ? '🔊' : '🔇';
+  $('#btnSound').setAttribute('aria-label', setup.sound ? 'Couper les sons' : 'Activer les sons');
+  $('#optSound').checked = setup.sound;
+}
+$('#btnTheme').onclick = () => { setup.look = { auto: 'light', light: 'dark', dark: 'auto' }[setup.look]; save(); applyLook(); };
+$('#btnSound').onclick = () => { setup.sound = !setup.sound; save(); applyLook(); sfx('flip'); };
+$('#optSound').onchange = e => { setup.sound = e.target.checked; save(); applyLook(); };
+$('#optLessons').onchange = e => { setup.lessons = e.target.checked; save(); };
+
+/* ---------- Logo ---------- */
+(function logo() {
+  const cols = ['var(--saffron)', 'var(--rose)', 'var(--sky)', 'var(--jade)', 'var(--rose)', 'var(--saffron)'];
+  $('#logo').innerHTML = [...'YATHAN'].map((l, i) =>
+    `<button class="lt" type="button" tabindex="-1" aria-hidden="true" style="--i:${i};--c:${cols[i]}"><span class="lf">${l}</span><span class="lb back" style="--cw:78px"></span></button>`).join('');
+  $('#logo').querySelectorAll('.lt').forEach(el => el.addEventListener('mouseenter', () => {
+    el.classList.remove('flip'); void el.offsetWidth; el.classList.add('flip');
+  }));
+  $('#logo').addEventListener('click', e => { if (e.target.closest('.lt')) sfx('flip'); });
+})();
+
+/* ---------- Écran d'accueil ---------- */
+function renderSetup() {
+  const wrap = $('#players'); wrap.innerHTML = '';
+  setup.players.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'prow'; row.style.setProperty('--pc', COLORS[i]);
+    row.innerHTML = `<button class="av" type="button" aria-label="Changer l’avatar du joueur ${i + 1}">${p.avatar}</button>
+      <input class="pname" value="${esc(p.name)}" maxlength="14" aria-label="Nom du joueur ${i + 1}">
+      <select aria-label="Type du joueur ${i + 1}"><option value="human">Humain</option><option value="easy">Robot facile</option><option value="mid">Robot malin</option><option value="hard">Robot génie</option></select>
+      <button class="icon-btn prm" type="button" aria-label="Retirer le joueur ${i + 1}" ${setup.players.length < 2 ? 'disabled' : ''}>✕</button>`;
+    row.querySelector('select').value = p.type;
+    row.querySelector('.av').onclick = () => { p.avatar = AVATARS[(AVATARS.indexOf(p.avatar) + 1) % AVATARS.length]; save(); renderSetup(); wrap.children[i]?.querySelector('.av').focus(); };
+    row.querySelector('.pname').oninput = e => { p.name = e.target.value; save(); };
+    row.querySelector('select').onchange = e => { p.type = e.target.value; save(); renderNote(); };
+    row.querySelector('.prm').onclick = () => { setup.players.splice(i, 1); save(); renderSetup(); };
+    wrap.appendChild(row);
+  });
+  $('#addPlayer').disabled = setup.players.length >= 4;
+  renderNote();
+
+  $('#themes').innerHTML = THEMES.map(t => `<button class="chip" type="button" data-t="${t.id}" aria-pressed="${t.id === setup.theme}"><span class="ic">${t.icon}</span><b>${t.label}</b><small>${t.hint}</small></button>`).join('');
+  const rec = store.get('records', {}), stars = store.get('stars', {});
+  $('#levels').innerHTML = LEVELS.map(l => {
+    const k = `${setup.theme}-${l.id}`, best = rec[k] && rec[k][0], st = stars[k] || 0;
+    return `<button class="lvl" type="button" data-l="${l.id}" aria-pressed="${l.id === setup.level}">
+      <span class="pips" aria-label="Difficulté ${l.id} sur 5">${[1,2,3,4,5].map(n => `<i class="${n <= l.id ? 'on' : ''}"></i>`).join('')}</span>
+      <b>${l.name}</b><small>${l.desc}</small>
+      <span class="best">${best ? `Record ${best.score}` : ''}${st ? ` ${'★'.repeat(st)}${'☆'.repeat(3 - st)}` : ''}</span></button>`;
+  }).join('');
+  $('#optLessons').checked = setup.lessons;
+}
+function renderNote() {
+  const h = setup.players.filter(p => p.type === 'human').length;
+  $('#playersNote').textContent = h === 0 ? 'Que des robots : installe-toi et regarde-les s’affronter.'
+    : setup.players.length === 1 ? 'Mode solo : vise les 3 étoiles avec le moins d’erreurs possible.'
+    : 'Jusqu’à 4 joueurs, humains ou robots. Les humains jouent à tour de rôle sur le même écran.';
+}
+$('#themes').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; setup.theme = b.dataset.t; save(); renderSetup(); });
+$('#levels').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; setup.level = +b.dataset.l; save(); renderSetup(); });
+$('#addPlayer').onclick = () => {
+  if (setup.players.length >= 4) return;
+  const used = setup.players.map(p => p.avatar);
+  setup.players.push({ name: `Joueur ${setup.players.length + 1}`, avatar: AVATARS.find(a => !used.includes(a)), type: 'human' });
+  save(); renderSetup();
+};
+$('#btnStart').onclick = () => startGame();
+$('#btnRecords').onclick = showRecords;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + id));
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Moteur de jeu ---------- */
+let G = null, els = new Map();
+const cur = () => G.players[G.cur];
+const isHuman = p => p.type === 'human';
+function after(ms, fn) {
+  const gen = G && G.gen;
+  setTimeout(() => { if (!G || G.gen !== gen || G.over && fn !== endGame) return; if (G.paused) { G.pending.push(fn); return; } fn(); }, ms);
+}
+
+function startGame(level) {
+  if (level) { setup.level = level; save(); }
+  const lvl = LEVELS[setup.level - 1], theme = THEMES.find(t => t.id === setup.theme);
+  const pairs = theme.build(lvl.pairs, lvl.id);
+  let uid = 0; const cards = [];
+  pairs.forEach((p, i) => {
+    cards.push({ uid: uid++, pair: i, side: 'a', face: p.a, state: 'hidden' });
+    cards.push({ uid: uid++, pair: i, side: 'b', face: p.b, state: 'hidden' });
+  });
+  for (let i = 0; i < lvl.traps; i++) cards.push({ uid: uid++, pair: -1, special: 'trap', face: { main: '💣', emoji: true, tag: 'Piège' }, state: 'hidden' });
+  for (let i = 0; i < lvl.stars; i++) cards.push({ uid: uid++, pair: -2, special: 'star', face: { main: '⭐', emoji: true, tag: 'Bonus' }, state: 'hidden' });
+  shuffle(cards);
+  G = {
+    lvl, theme, pairs, cards, cur: 0, flipped: [], lock: true, matched: 0, missTotal: 0, elapsed: 0,
+    turnLeft: 0, turnActive: false, paused: false, over: false, pending: [], gen: Math.random(), learned: [], lastSec: -1,
+    players: setup.players.map((p, i) => ({ name: (p.name || '').trim() || `Joueur ${i + 1}`, avatar: p.avatar, type: p.type, color: COLORS[i],
+      score: 0, found: 0, combo: 0, best: 0, misses: 0, traps: 0, powers: { peek: 1, hint: 1 }, memory: new Map() }))
+  };
+  $('#gTitle').innerHTML = `<span>${theme.icon} ${esc(theme.label)}</span><span class="pips" aria-label="Niveau ${lvl.id}">${[1,2,3,4,5].map(n => `<i class="${n <= lvl.id ? 'on' : ''}"></i>`).join('')}</span><span>${lvl.name}</span>`;
+  $('#timer').hidden = !lvl.turn;
+  $('#nbList').innerHTML = ''; $('#notebook').open = false;
+  showScreen('game');
+  buildGrid(); renderHud();
+  if (lvl.peek) {
+    G.cards.forEach(c => c.peek = true); paintAll();
+    $('#turnLabel').textContent = 'Mémorise les cartes…';
+    after(lvl.peek + 450, () => {
+      G.cards.forEach(c => { c.peek = false; G.players.forEach(p => { if (!isHuman(p) && Math.random() < BOTS[p.type] * .6) p.memory.set(c.uid, c.special || c.pair); }); });
+      paintAll(); after(450, beginTurn);
+    });
+  } else after(300, beginTurn);
+}
+
+function layout() {
+  if (!G) return;
+  const grid = $('#grid'), n = G.cards.length, narrow = innerWidth < 560;
+  let cols = G.lvl.cols; if (narrow) cols = Math.min(cols, n > 20 ? 5 : 4);
+  const rows = Math.ceil(n / cols), gap = narrow ? 6 : 10;
+  const availW = Math.min(innerWidth - (narrow ? 20 : 40), 1000);
+  const availH = Math.max(340, innerHeight - 290);
+  const byW = (availW - gap * (cols - 1)) / cols;
+  const byH = ((availH - gap * (rows - 1)) / rows) * .78;
+  const cw = Math.max(50, Math.min(130, byW, narrow ? byW : byH));
+  grid.style.setProperty('--cols', cols); grid.style.setProperty('--cw', cw + 'px'); grid.style.setProperty('--gap', gap + 'px');
+}
+addEventListener('resize', () => { layout(); sizeCanvas(); });
+
+function buildGrid() {
+  const grid = $('#grid'); grid.innerHTML = ''; els = new Map();
+  G.cards.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'card'; b.dataset.uid = c.uid;
+    const len = c.face.main.length, word = Math.max(...c.face.main.split(/[\s-]+/).map(w => w.length));
+    const cls = c.face.emoji ? 'emoji' : c.face.big ? 'big' : (len > 11 || word > 9) ? 'xlong' : (len > 8 || word > 7) ? 'long' : '';
+    const side = c.special ? 'sp-' + c.special : 'side-' + c.side;
+    b.innerHTML = `<span class="inner" aria-hidden="true"><span class="face back"></span><span class="face front ${side}">${c.face.tag ? `<span class="tag">${esc(c.face.tag)}</span>` : ''}<span class="main ${cls}">${esc(c.face.main)}</span></span></span>`;
+    grid.appendChild(b); els.set(c.uid, b);
+  });
+  layout(); paintAll();
+}
+function paintCard(c, i) {
+  const el = els.get(c.uid); if (!el) return;
+  const up = c.state !== 'hidden' || !!c.peek;
+  el.classList.toggle('is-up', up);
+  el.classList.toggle('is-matched', c.state === 'matched');
+  el.classList.toggle('is-gone', c.state === 'gone');
+  if (c.state === 'matched') el.style.setProperty('--owner', G.players[c.by].color);
+  el.disabled = c.state === 'matched' || c.state === 'gone';
+  el.setAttribute('aria-label', up ? `${c.face.tag ? c.face.tag + ' : ' : ''}${c.face.main}${c.state === 'matched' ? ', trouvée' : ''}` : `Carte cachée ${i + 1}`);
+}
+function paintAll() {
+  G.cards.forEach(paintCard);
+  $('#grid').classList.toggle('can-play', !!G && !G.lock && !G.over && isHuman(cur()));
+}
+
+function observe(c) {
+  G.players.forEach(p => { if (!isHuman(p) && Math.random() < BOTS[p.type]) p.memory.set(c.uid, c.special || c.pair); });
+}
+
+function beginTurn() {
+  G.flipped = []; G.lock = false;
+  G.turnLeft = G.lvl.turn * 1000; G.turnActive = !!G.lvl.turn; G.lastSec = -1;
+  renderHud(); paintAll();
+  if (!isHuman(cur())) after(750, botStep);
+}
+function nextTurn() {
+  const prev = G.cur;
+  G.cur = (G.cur + 1) % G.players.length;
+  if (G.players.length > 1 && G.cur !== prev && isHuman(cur())) toast(`${cur().avatar} À ${cur().name} de jouer !`, '', 1300);
+  beginTurn();
+}
+
+function onCardClick(uid) {
+  if (!G || G.paused || G.over || G.lock || !isHuman(cur())) return;
+  flip(uid);
+}
+$('#grid').addEventListener('click', e => { const b = e.target.closest('.card'); if (b) onCardClick(+b.dataset.uid); });
+
+function flip(uid) {
+  const i = G.cards.findIndex(c => c.uid === uid), c = G.cards[i];
+  if (!c || c.state !== 'hidden') return;
+  const p = cur();
+  c.state = 'up'; sfx('flip'); observe(c); paintCard(c, i);
+
+  if (c.special === 'star') {
+    G.lock = true; const wasActive = G.turnActive; G.turnActive = false;
+    after(550, () => {
+      c.state = 'gone'; const k = Math.random() < .5 ? 'peek' : 'hint'; p.powers[k]++;
+      sfx('star'); burst(40, ...center(c));
+      toast(`⭐ Étoile ! ${p.name} gagne ${k === 'peek' ? 'un coup d’œil' : 'un indice'}.`);
+      G.lock = false; G.turnActive = wasActive; paintAll(); renderHud();
+      if (!isHuman(p)) after(600, botStep);
+    });
+    return;
+  }
+  if (c.special === 'trap') {
+    G.lock = true; G.turnActive = false; p.traps++; p.combo = 0; p.score = Math.max(0, p.score - 15);
+    sfx('trap'); $('#grid').classList.remove('quake'); void $('#grid').offsetWidth; $('#grid').classList.add('quake');
+    floatText(c, '−15');
+    toast(`💣 Piège ! ${p.name} perd 15 points et passe son tour.`);
+    renderHud();
+    after(1200, () => { c.state = 'gone'; G.flipped.forEach(x => x.state = 'hidden'); G.flipped = []; paintAll(); nextTurn(); });
+    return;
+  }
+  G.flipped.push(c);
+  if (G.flipped.length === 2) { G.lock = true; G.turnActive = false; paintAll(); resolve(); }
+  else { renderPowers(); if (!isHuman(p)) after(650, botStep); }
+}
+
+function resolve() {
+  const [a, b] = G.flipped, p = cur();
+  if (a.pair === b.pair) {
+    after(420, () => {
+      a.state = b.state = 'matched'; a.by = b.by = G.cur;
+      p.found++; p.combo++; p.best = Math.max(p.best, p.combo); G.matched++;
+      let pts = 10 * Math.min(p.combo, 5);
+      if (G.lvl.turn) pts += Math.ceil(G.turnLeft / 2000);
+      p.score += pts;
+      sfx('match', p.combo); floatText(b, `+${pts}`);
+      if (p.combo >= 3) { burst(50, ...center(b)); toast(`🔥 Combo ×${Math.min(p.combo, 5)} pour ${p.name} !`, '', 1400); }
+      const pair = G.pairs[a.pair]; G.learned.push(pair.lesson);
+      const li = document.createElement('li'); li.textContent = pair.lesson; $('#nbList').prepend(li);
+      $('#nbTitle').textContent = `📘 Carnet (${G.learned.length})`;
+      if (setup.lessons && !(p.combo >= 3)) toast(pair.lesson, 'lesson', 3600);
+      paintAll(); renderHud();
+      if (G.matched === G.pairs.length) { after(800, endGame); return; }
+      G.flipped = []; G.lock = false; G.turnLeft = G.lvl.turn * 1000; G.turnActive = !!G.lvl.turn; G.lastSec = -1;
+      paintAll(); renderHud();
+      if (!isHuman(p)) after(750, botStep);
+    });
+  } else {
+    p.misses++; p.combo = 0; G.missTotal++; sfx('miss');
+    [a, b].forEach(c => { const el = els.get(c.uid); el.classList.remove('is-wrong'); void el.offsetWidth; el.classList.add('is-wrong'); });
+    renderHud();
+    after(1050, () => {
+      a.state = b.state = 'hidden'; G.flipped = [];
+      [a, b].forEach(c => els.get(c.uid)?.classList.remove('is-wrong'));
+      paintAll();
+      if (G.lvl.quake && G.missTotal % G.lvl.quake === 0) quake();
+      nextTurn();
+    });
+  }
+}
+
+function timeout() {
+  const p = cur(); G.turnActive = false; G.lock = true; p.combo = 0;
+  sfx('miss'); toast(`⏰ Temps écoulé pour ${p.name} !`);
+  after(700, () => { G.flipped.forEach(c => c.state = 'hidden'); G.flipped = []; paintAll(); nextTurn(); });
+}
+
+function quake() {
+  const hid = G.cards.map((c, i) => [c, i]).filter(([c]) => c.state === 'hidden');
+  if (hid.length < 4) return;
+  shuffle(hid);
+  const idx = hid.slice(0, 4).map(x => x[1]), moved = idx.map(i => G.cards[i]);
+  const rot = [...moved.slice(1), moved[0]];
+  idx.forEach((ix, k) => G.cards[ix] = rot[k]);
+  G.players.forEach(p => moved.forEach(c => p.memory.delete(c.uid)));
+  buildGrid();
+  moved.forEach(c => { const el = els.get(c.uid); el.classList.add('is-moved'); setTimeout(() => el.classList.remove('is-moved'), 1200); });
+  $('#grid').classList.remove('quake'); void $('#grid').offsetWidth; $('#grid').classList.add('quake');
+  sfx('trap'); toast('🌋 Secousse ! Quatre cartes ont changé de place.', '', 2600);
+}
+
+/* ---------- Robots ---------- */
+function botStep() {
+  if (!G || G.over || G.paused) return;
+  const p = cur(); if (isHuman(p)) return;
+  const hidden = G.cards.filter(c => c.state === 'hidden');
+  const mem = c => p.memory.get(c.uid);
+  const safe = hidden.filter(c => mem(c) !== 'trap');
+  const unknown = safe.filter(c => !p.memory.has(c.uid));
+  if (G.flipped.length === 0) {
+    const groups = {};
+    hidden.forEach(c => { const v = mem(c); if (typeof v === 'number' && v >= 0) (groups[v] = groups[v] || []).push(c); });
+    const known = Object.values(groups).find(g => g.length >= 2);
+    if (known) return flip(known[0].uid);
+    const star = hidden.find(c => mem(c) === 'star');
+    if (star) return flip(star.uid);
+    const pool = unknown.length ? unknown : safe.length ? safe : hidden;
+    return flip(pick(pool).uid);
+  }
+  const first = G.flipped[0];
+  const partner = hidden.find(c => mem(c) === first.pair);
+  if (partner) return flip(partner.uid);
+  const pool = unknown.length ? unknown : safe.length ? safe : hidden;
+  flip(pick(pool).uid);
+}
+
+/* ---------- Pouvoirs ---------- */
+function usePower(k) {
+  if (!G || G.over || G.paused || G.lock || !isHuman(cur())) return;
+  const p = cur(); if (p.powers[k] < 1) return;
+  if (k === 'peek') {
+    if (G.flipped.length) return toast('Utilise le coup d’œil avant de retourner une carte.');
+    p.powers.peek--; G.lock = true; const wasActive = G.turnActive; G.turnActive = false;
+    G.cards.forEach(c => { if (c.state === 'hidden') c.peek = true; }); paintAll(); renderHud(); sfx('star');
+    after(1500, () => { G.cards.forEach(c => c.peek = false); G.lock = false; G.turnActive = wasActive; paintAll(); renderHud(); });
+  } else {
+    if (G.flipped.length !== 1) return toast('Retourne d’abord une carte, puis demande un indice.');
+    const partner = G.cards.find(c => c.state === 'hidden' && c.pair === G.flipped[0].pair);
+    if (!partner) return;
+    p.powers.hint--; sfx('star');
+    const el = els.get(partner.uid); el.classList.remove('is-hint'); void el.offsetWidth; el.classList.add('is-hint');
+    setTimeout(() => el.classList.remove('is-hint'), 2300);
+    renderHud();
+  }
+}
+$('#pwPeek').onclick = () => usePower('peek');
+$('#pwHint').onclick = () => usePower('hint');
+
+/* ---------- Affichage du jeu ---------- */
+function renderHud() {
+  if (!G) return;
+  $('#scoreboard').innerHTML = G.players.map((p, i) => `
+    <div class="pl ${i === G.cur && !G.over ? 'active' : ''}" style="--pc:${p.color}">
+      <span class="av">${p.avatar}</span>
+      <span><span class="pn">${esc(p.name)}${isHuman(p) ? '' : ' 🤖'}</span><span class="ps"><b>${p.score}</b> pts, ${p.found} ${p.found > 1 ? 'paires' : 'paire'}</span></span>
+      ${p.combo > 1 ? `<span class="combo">×${Math.min(p.combo, 5)}</span>` : ''}
+      <span class="pw" title="Pouvoirs">👁${p.powers.peek} 💡${p.powers.hint}</span>
+    </div>`).join('');
+  const p = cur();
+  $('#turnLabel').innerHTML = G.over ? 'Partie terminée' : isHuman(p) ? `${p.avatar} À toi, <b>${esc(p.name)}</b>` : `${p.avatar} <b>${esc(p.name)}</b> réfléchit…`;
+  const left = G.pairs.length - G.matched;
+  $('#left').textContent = `${left} ${left > 1 ? 'paires' : 'paire'} à trouver`;
+  renderPowers(); updateTimer();
+}
+function renderPowers() {
+  const p = cur(), can = !G.over && !G.lock && isHuman(p);
+  $('#pwPeek').textContent = `👁 Coup d’œil (${p.powers.peek})`;
+  $('#pwHint').textContent = `💡 Indice (${p.powers.hint})`;
+  $('#pwPeek').disabled = !can || p.powers.peek < 1 || G.flipped.length > 0;
+  $('#pwHint').disabled = !can || p.powers.hint < 1 || G.flipped.length !== 1;
+}
+function updateTimer() {
+  if (!G || !G.lvl.turn) return;
+  const r = Math.max(0, G.turnLeft / (G.lvl.turn * 1000));
+  $('#timerFill').style.width = (r * 100) + '%';
+  $('#timer').classList.toggle('low', r < .3);
+}
+function center(c) { const r = els.get(c.uid).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
+function floatText(c, txt) {
+  const [x, y] = center(c), s = document.createElement('span');
+  s.className = 'float'; s.textContent = txt; s.style.left = x + 'px'; s.style.top = (y - 20) + 'px';
+  document.body.appendChild(s); setTimeout(() => s.remove(), 950);
+}
+
+/* ---------- Horloge ---------- */
+setInterval(() => {
+  if (!G || G.paused || G.over) return;
+  G.elapsed += 100;
+  const s = Math.floor(G.elapsed / 1000);
+  $('#clock').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  if (G.turnActive) {
+    G.turnLeft -= 100; updateTimer();
+    const sec = Math.ceil(G.turnLeft / 1000);
+    if (sec <= 3 && sec > 0 && sec !== G.lastSec && isHuman(cur())) { G.lastSec = sec; sfx('tick'); }
+    if (G.turnLeft <= 0) timeout();
+  }
+}, 100);
+
+/* ---------- Pause ---------- */
+function pause() {
+  if (!G || G.over || G.paused) return;
+  G.paused = true;
+  openModal(`<h2>Pause</h2><p>La partie t’attend. Le chrono est arrêté.</p>
+    <div class="actions"><button class="btn" id="mResume" type="button">Reprendre</button>
+    <button class="btn ghost" id="mRestart" type="button">Recommencer</button>
+    <button class="btn ghost" id="mMenu" type="button">Retour au menu</button></div>`, resume);
+  $('#mResume').onclick = () => closeModal();
+  $('#mRestart').onclick = () => { closeModal(false); G.gen = null; startGame(); };
+  $('#mMenu').onclick = () => { closeModal(false); quit(); };
+}
+function resume() {
+  if (!G || !G.paused) return;
+  G.paused = false; const q = G.pending; G.pending = []; q.forEach(fn => fn());
+}
+function quit() { if (G) G.gen = null; G = null; renderSetup(); showScreen('setup'); }
+$('#btnPause').onclick = pause;
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, select')) return;
+  if ($('#backdrop').classList.contains('open')) { if (e.key === 'Escape') closeModal(); return; }
+  if (!G || !$('#screen-game').classList.contains('active')) return;
+  if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') pause();
+  if (e.key === '1') usePower('peek');
+  if (e.key === '2') usePower('hint');
+});
+
+/* ---------- Fin de partie ---------- */
+function endGame() {
+  G.over = true; G.turnActive = false; renderHud(); paintAll();
+  sfx('win'); burst(180); setTimeout(() => burst(120, innerWidth * .25, innerHeight * .4), 350); setTimeout(() => burst(120, innerWidth * .75, innerHeight * .4), 650);
+  const acc = p => { const t = p.found + p.misses; return t ? p.found / t : 0; };
+  const ranked = [...G.players].sort((a, b) => b.score - a.score);
+  const top = ranked[0].score, winners = ranked.filter(p => p.score === top);
+  const humans = G.players.filter(isHuman), solo = G.players.length === 1;
+  const key = `${G.theme.id}-${G.lvl.id}`;
+
+  const rec = store.get('records', {}); const list = rec[key] || []; const prevBest = list[0] ? list[0].score : 0;
+  humans.forEach(p => list.push({ name: p.name, score: p.score, date: Date.now() }));
+  list.sort((a, b) => b.score - a.score); rec[key] = list.slice(0, 5); store.set('records', rec);
+  const newRecord = humans.some(p => p.score > prevBest && p.score > 0);
+
+  let stars = 0;
+  if (solo && humans.length) {
+    const a = acc(humans[0]); stars = a >= .8 ? 3 : a >= .55 ? 2 : 1;
+    const st = store.get('stars', {}); st[key] = Math.max(st[key] || 0, stars); store.set('stars', st);
+  }
+
+  const got = store.get('badges', {}), fresh = [];
+  const give = id => { if (!got[id]) { got[id] = Date.now(); fresh.push(id); } };
+  if (humans.length) {
+    give('first');
+    if (humans.some(p => acc(p) >= .8 && p.found >= 3)) give('elephant');
+    if (humans.some(p => p.best >= 4)) give('combo4');
+    if (G.lvl.traps && humans.some(p => p.traps === 0 && p.found > 0)) give('survivor');
+    if (solo && G.lvl.id >= 3 && G.elapsed < 120000) give('fast');
+    if (G.lvl.id === 5 && winners.some(isHuman)) give('master');
+    const tp = new Set(store.get('themesPlayed', [])); tp.add(G.theme.id); store.set('themesPlayed', [...tp]);
+    if (G.theme.id === 'informatique') give('geek');
+    if (THEMES.every(t => tp.has(t.id))) give('explorer');
+  }
+  store.set('badges', got);
+
+  const mins = Math.floor(G.elapsed / 60000), secs = Math.floor(G.elapsed / 1000) % 60;
+  const title = solo ? `Bravo ${esc(ranked[0].name)} !` : winners.length > 1 ? 'Égalité !' : `🏆 ${esc(winners[0].name)} gagne !`;
+  const medals = ['🥇', '🥈', '🥉', '4'];
+  openModal(`
+    <h2>${title}</h2>
+    ${solo && stars ? `<div class="stars" aria-label="${stars} étoiles sur 3">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>` : ''}
+    <p>${G.theme.icon} ${esc(G.theme.label)}, niveau ${G.lvl.name}, en ${mins} min ${String(secs).padStart(2, '0')} s.${newRecord ? ' <b>Nouveau record !</b>' : ''}</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th></th><th>Joueur</th><th>Score</th><th>Paires</th><th>Précision</th><th>Meilleur combo</th></tr></thead>
+      <tbody>${ranked.map((p, i) => `<tr><td>${medals[i]}</td><td>${p.avatar} ${esc(p.name)}</td><td><b>${p.score}</b></td><td>${p.found}</td><td>${Math.round(acc(p) * 100)} %</td><td>×${Math.min(p.best, 5)}</td></tr>`).join('')}</tbody>
+    </table></div>
+    ${fresh.length ? `<h3 style="margin-top:18px">Nouveaux badges</h3><div class="badges">${fresh.map(id => { const b = BADGES.find(x => x.id === id); return `<div class="badge fresh"><span class="bi">${b.icon}</span><b>${b.name}</b><small>${b.desc}</small></div>`; }).join('')}</div>` : ''}
+    <details style="margin-top:18px" open><summary><b>Ce que tu as appris (${G.learned.length})</b></summary><ul class="learned">${G.learned.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
+    <div class="actions">
+      <button class="btn" id="mAgain" type="button">Rejouer</button>
+      ${G.lvl.id < 5 ? `<button class="btn ghost" id="mNext" type="button">Niveau suivant</button>` : ''}
+      <button class="btn ghost" id="mHome" type="button">Menu</button>
+    </div>`, quit);
+  $('#mAgain').onclick = () => { closeModal(false); startGame(); };
+  if ($('#mNext')) $('#mNext').onclick = () => { closeModal(false); startGame(G.lvl.id + 1); };
+  $('#mHome').onclick = () => { closeModal(false); quit(); };
+}
+
+/* ---------- Records & badges ---------- */
+function showRecords() {
+  const rec = store.get('records', {}), got = store.get('badges', {});
+  const rows = THEMES.flatMap(t => LEVELS.map(l => { const r = rec[`${t.id}-${l.id}`]; return r && r[0] ? `<tr><td>${t.icon} ${esc(t.label)}</td><td>${l.name}</td><td><b>${r[0].score}</b></td><td>${esc(r[0].name)}</td></tr>` : ''; })).join('');
+  openModal(`
+    <h2>Records</h2>
+    ${rows ? `<div class="table-wrap"><table><thead><tr><th>Thème</th><th>Niveau</th><th>Meilleur score</th><th>Par</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p>Aucun record pour l’instant. Lance une partie pour inscrire le premier.</p>'}
+    <h3 style="margin-top:20px">Badges (${Object.keys(got).length}/${BADGES.length})</h3>
+    <div class="badges">${BADGES.map(b => `<div class="badge ${got[b.id] ? '' : 'locked'}"><span class="bi">${b.icon}</span><b>${b.name}</b><small>${b.desc}</small></div>`).join('')}</div>
+    <div class="actions"><button class="btn" id="mClose" type="button">Fermer</button>
+    <button class="btn ghost" id="mReset" type="button">Effacer les records</button></div>`);
+  $('#mClose').onclick = () => closeModal();
+  $('#mReset').onclick = () => { if (confirm('Effacer tous les records, étoiles et badges ?')) { ['records', 'badges', 'stars', 'themesPlayed'].forEach(k => store.set(k, k === 'themesPlayed' ? [] : {})); closeModal(); renderSetup(); } };
+}
+
+
+/* ---------- Bouton retour Android ---------- */
+(function androidBack() {
+  const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if (!App) return;
+  App.addListener('backButton', () => {
+    if ($('#backdrop').classList.contains('open')) { if (G && G.over) { closeModal(false); quit(); } else closeModal(); return; }
+    if (G && $('#screen-game').classList.contains('active')) { if (G.over) quit(); else pause(); return; }
+    App.exitApp();
+  });
+})();
+
+/* ---------- Introduction de 5 secondes ---------- */
+(function intro() {
+  const el = $('#intro'); if (!el) return;
+  const app = $('.wrap'); app.setAttribute('inert', '');
+  setTimeout(() => { el.classList.add('hide'); app.removeAttribute('inert'); setTimeout(() => el.remove(), 700); }, 5000);
+})();
+applyLook();
+renderSetup();
+</script>
+</body>
+</html>
